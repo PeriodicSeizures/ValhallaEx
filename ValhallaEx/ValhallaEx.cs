@@ -47,22 +47,23 @@ namespace ValhallaEx
                 {
                     Console.instance.Print("(ValhallaEx) Custom command functionality enabled");
 
-                    new Terminal.ConsoleCommand("vs", "Execute custom Valhalla server commands", delegate (Terminal.ConsoleEventArgs args)
+                    new Terminal.ConsoleCommand(".vs", "Execute custom Valhalla server commands", delegate (Terminal.ConsoleEventArgs args)
                     {
-                        if (args.Args.Length > 1)
+                        if (!(ZNet.instance.IsDedicated() && !ZNet.instance.IsServer()))
                         {
-                            try
+                            if (args.Args.Length > 1)
                             {
                                 string cmd = args.Args[1];
                                 List<string> list = args.Args.Skip(2).ToList();
                                 ZNet.instance.GetServerRPC().Invoke("vs", cmd, list);
-                            } catch (Exception e)
+                            }
+                            else
                             {
-                                Console.instance.Print("(ValhallaEx) Error: " + e);
+                                Console.instance.Print("(ValhallaEx) Input more args: .vs <command> [args...]");
                             }
                         } else
                         {
-                            Console.instance.Print("(ValhallaEx) Input more args: /vs <command> [args...]");
+                            Console.instance.Print("(ValhallaEx) .vs can only be ran while connected to a server");
                         }
                     });
 
