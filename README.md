@@ -1,2 +1,4 @@
 # ValhallaEx
- adds /vs command for use with Valhalla server
+ adds `.vs` command for use with Valhalla server.
+ 
+ Usage: `.vs <command> ...`
