@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -76,6 +77,7 @@ namespace ValhallaEx
             }
         }
 
+        // Dungeon logging tools
         [HarmonyPatch(typeof(DungeonGenerator))]
         class DungeonGeneratorPatch
         {
@@ -91,7 +93,34 @@ namespace ValhallaEx
                     + ", m_originalPosition: " + __instance.m_originalPosition
                 );
             }
-        }        
+        }
+
+        // ZRpc infinite timeout patch
+        [HarmonyPatch(typeof(ZRpc))]
+        class ZRpcPatch
+        {
+            [HarmonyPrefix]
+            [HarmonyPatch(nameof(ZRpc.Update))]
+            static void GeneratePostfix()
+            {
+                ZRpc.m_timeout = 1 * 1000 * 60 * 60 * 24;
+            }
+        }
+
+        // ZSteamSocket timeout patch
+        [HarmonyPatch(typeof(ZSteamSocket))]
+        class ZSteamSocketPatch
+        {
+            [HarmonyTranspiler]
+            [HarmonyPatch(nameof(ZSteamSocket.RegisterGlobalCallbacks))]
+            static IEnumerable<CodeInstruction> RegisterGlobalCallbacksTranspiler(IEnumerable<CodeInstruction> instructions)
+            {
+                return new CodeMatcher(instructions)
+                    .MatchForward(useEnd: false, new CodeMatch(OpCodes.Ldc_R4, 30000f))
+                    .SetAndAdvance(OpCodes.Ldc_R4, (float)(1 * 1000 * 60 * 60 * 24))
+                    .InstructionEnumeration();
+            }
+        }
 
     }
 
