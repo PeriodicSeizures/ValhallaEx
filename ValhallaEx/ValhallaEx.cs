@@ -21,7 +21,7 @@ namespace ValhallaEx
         // BepInEx' plugin metadata
         public const string PluginGUID = "com.crzi.ValhallaEx";
         public const string PluginName = "ValhallaEx";
-        public const string PluginVersion = "1.0.0";
+        public const string PluginVersion = "1.0.1";
 
         Harmony _harmony;
 
@@ -56,7 +56,7 @@ namespace ValhallaEx
                             {
                                 string cmd = args.Args[1];
                                 List<string> list = args.Args.Skip(2).ToList();
-                                ZNet.instance.GetServerRPC().Invoke("vs", cmd, list);
+                                ZNet.instance.GetServerRPC().Invoke("OnCommand", cmd, list);
                             }
                             else
                             {
